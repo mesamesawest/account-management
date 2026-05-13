@@ -127,6 +127,18 @@
   .filters-bar select:focus { border-color: var(--accent); }
   .filter-group { display: flex; align-items: center; gap: 6px; }
   .filter-divider { width: 1px; height: 24px; background: var(--border); }
+  .filters-bar input[type="date"] {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    outline: none;
+  }
+  .filters-bar input[type="date"]:focus { border-color: var(--accent); }
   .results-count {
     margin-left: auto;
     font-family: 'DM Mono', monospace;
@@ -287,6 +299,15 @@
   <!-- FILTERS -->
   <div class="filters-bar">
     <div class="filter-group">
+      <label>From</label>
+      <input type="date" id="filter-date-from">
+    </div>
+    <div class="filter-group">
+      <label>To</label>
+      <input type="date" id="filter-date-to">
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-group">
       <label>Month</label>
       <select id="filter-month"><option value="all">All Months</option></select>
     </div>
@@ -313,6 +334,8 @@
         <option value="not-sent">Not Sent</option>
       </select>
     </div>
+    <div class="filter-divider"></div>
+    <button id="clear-dates" onclick="clearDates()" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text-secondary);cursor:pointer;">Clear Dates</button>
     <div class="results-count" id="results-count"></div>
   </div>
 
@@ -444,6 +467,14 @@ function populateFilters() {
   ["filter-month","filter-status","filter-paid","filter-invoice"].forEach(id => {
     document.getElementById(id).addEventListener("change", render);
   });
+  document.getElementById("filter-date-from").addEventListener("change", render);
+  document.getElementById("filter-date-to").addEventListener("change", render);
+}
+
+function clearDates() {
+  document.getElementById("filter-date-from").value = "";
+  document.getElementById("filter-date-to").value = "";
+  render();
 }
 
 function getFiltered() {
@@ -451,6 +482,8 @@ function getFiltered() {
   const status = document.getElementById("filter-status").value;
   const paid = document.getElementById("filter-paid").value;
   const invoice = document.getElementById("filter-invoice").value;
+  const dateFrom = document.getElementById("filter-date-from").value;
+  const dateTo = document.getElementById("filter-date-to").value;
 
   return allData.filter(r => {
     if (month !== "all" && !r.renewal.startsWith(month)) return false;
@@ -459,6 +492,8 @@ function getFiltered() {
     if (paid === "unpaid" && r.paid) return false;
     if (invoice === "sent" && !r.invoiceSent) return false;
     if (invoice === "not-sent" && r.invoiceSent) return false;
+    if (dateFrom && r.renewal < dateFrom) return false;
+    if (dateTo && r.renewal > dateTo) return false;
     return true;
   });
 }
