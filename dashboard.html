@@ -519,15 +519,17 @@ function updateStats(data) {
   const confirmed = data.filter(r => r.status === "Confirmed Renewal");
   const paid = data.filter(r => r.paid);
   const cancel = data.filter(r => r.status.toLowerCase().includes("cancell"));
+  const total = data.length;
+  const pct = n => total > 0 ? Math.round(n / total * 100) + "%" : "—";
 
-  document.getElementById("stat-total").textContent = data.length;
+  document.getElementById("stat-total").textContent = total;
   document.getElementById("stat-acv").textContent = fmtMoney(totalACV);
   document.getElementById("stat-confirmed").textContent = confirmed.length;
-  document.getElementById("stat-confirmed-acv").textContent = fmtMoney(confirmed.reduce((s,r) => s+r.value,0));
+  document.getElementById("stat-confirmed-acv").textContent = `${pct(confirmed.length)} · ${fmtMoney(confirmed.reduce((s,r) => s+r.value,0))}`;
   document.getElementById("stat-paid").textContent = paid.length;
-  document.getElementById("stat-paid-acv").textContent = fmtMoney(paid.reduce((s,r) => s+r.value,0));
+  document.getElementById("stat-paid-acv").textContent = `${pct(paid.length)} · ${fmtMoney(paid.reduce((s,r) => s+r.value,0))}`;
   document.getElementById("stat-cancel").textContent = cancel.length;
-  document.getElementById("stat-cancel-acv").textContent = fmtMoney(cancel.reduce((s,r) => s+r.value,0));
+  document.getElementById("stat-cancel-acv").textContent = `${pct(cancel.length)} · ${fmtMoney(cancel.reduce((s,r) => s+r.value,0))}`;
 }
 
 function updateTable(data) {
